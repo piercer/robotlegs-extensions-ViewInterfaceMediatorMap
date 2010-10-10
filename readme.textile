@@ -1,0 +1,22 @@
+h2. View Interface Mediator Map
+
+A pure view interface enabled MediatorMap for use in a Robotlegs context
+
+h2. Rationale 
+
+Sometimes you want to inject a view into a mediator as an interface. For example
+
+pre.
+public class myMediator extends Mediator
+{
+	[Inject]
+	public var view:IViewInterface;
+	.
+	.
+	.
+}
+
+The normal mechanism for mapping a mediator to a view in Robotlegs is to use the  
+
+
+public function mapView(viewClassOrName:*, mediatorClass:Class, injectViewAs:* = null, autoCreate:Boolean = true, autoRemove:Boolean = true):void
