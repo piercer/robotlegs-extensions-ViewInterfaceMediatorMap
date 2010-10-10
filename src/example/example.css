@@ -9,3 +9,13 @@ NumericStepperInputComponent
 {
     skin-class: ClassReference("example.skins.NumericStepperInputComponentSkin");
 }
+
+SliderInputComponent
+{
+    skin-class: ClassReference("example.skins.SliderInputComponentSkin");
+}
+
+DropDownListInputComponent
+{
+    skin-class: ClassReference("example.skins.DropDownListInputComponentSkin");
+}

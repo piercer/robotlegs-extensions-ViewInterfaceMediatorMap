@@ -2,7 +2,7 @@ package example.model
 {
     import example.signals.NumberUpdatedSignal;
 
-    public class NumberController
+    public class NumberModel
     {
 
         [Inject]
@@ -10,7 +10,7 @@ package example.model
 
         private var _currentNumber:Number;
 
-        public function NumberController()
+        public function NumberModel()
         {
 
         }

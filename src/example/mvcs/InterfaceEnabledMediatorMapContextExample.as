@@ -2,7 +2,7 @@ package example.mvcs
 {
     import example.controller.NumberEnteredCommand;
     import example.events.NumberEnteredEvent;
-    import example.model.NumberController;
+    import example.model.NumberModel;
     import example.signals.NumberUpdatedSignal;
     import example.view.INumberDisplay;
     import example.view.INumberEntry;
@@ -29,7 +29,7 @@ package example.mvcs
 
         override public function startup():void
         {
-            injector.mapSingleton(NumberController);
+            injector.mapSingleton(NumberModel);
             injector.mapSingleton(NumberUpdatedSignal);
 
             mediatorMap.mapView(INumberEntry,NumberEntryMediator);

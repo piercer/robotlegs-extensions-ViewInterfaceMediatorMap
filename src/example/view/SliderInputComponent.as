@@ -7,18 +7,18 @@ package example.view
 
     import org.osflash.signals.Signal;
 
-    import spark.components.NumericStepper;
+    import spark.components.HSlider;
     import spark.components.supportClasses.SkinnableComponent;
 
-    public class NumericStepperInputComponent extends SkinnableComponent implements INumberEntry
+    public class SliderInputComponent extends SkinnableComponent implements INumberEntry
     {
 
         [SkinPart(required="true")]
-        public var numberStepper:NumericStepper;
+        public var numberSlider:HSlider;
 
         private var _numberEntered:Signal;
 
-        public function NumericStepperInputComponent()
+        public function SliderInputComponent()
         {
             _numberEntered = new Signal(Number);
         }
@@ -28,32 +28,31 @@ package example.view
             return _numberEntered;
         }
 
-        private function onNumberStepperChange(event:Event):void
-        {
-            _numberEntered.dispatch(numberStepper.value);
-        }
-
         override protected function partAdded(partName:String, instance:Object):void
         {
             super.partAdded(partName, instance);
-            switch ( instance )
+            switch( instance )
             {
-                case numberStepper:
-                    numberStepper.addEventListener(Event.CHANGE,onNumberStepperChange);
+                case numberSlider:
+                    numberSlider.addEventListener(Event.CHANGE,onNumberSliderChange);
                     break;
             }
         }
 
-
         override protected function partRemoved(partName:String, instance:Object):void
         {
-            switch ( instance )
+            switch( instance )
             {
-                case numberStepper:
-                    numberStepper.removeEventListener(Event.CHANGE,onNumberStepperChange);
+                case numberSlider:
+                    numberSlider.removeEventListener(Event.CHANGE,onNumberSliderChange);
                     break;
             }
-            super.partRemoved(partName, instance);
+            super.partAdded(partName, instance);
+        }
+
+        private function onNumberSliderChange(event:Event):void
+        {
+            _numberEntered.dispatch(numberSlider.value);
         }
     }
 

@@ -6,6 +6,12 @@
         xmlns:view="example.view.*"
 >
 
+    <s:states>
+        <s:State name="stepper"/>
+        <s:State name="slider"/>
+        <s:State name="dropdown"/>
+    </s:states>
+
     <fx:Style source="example.css"/>
 
     <fx:Declarations>
@@ -16,7 +22,19 @@
         <s:VerticalLayout/>
     </s:layout>
 
-    <view:LabelDisplayComponent width="100%" height="20"/>
-    <view:NumericStepperInputComponent width="100%" height="20"/>
+    <view:LabelDisplayComponent width="100" height="20"/>
+    <view:NumericStepperInputComponent width="100" height="20" includeIn="stepper"/>
+    <view:SliderInputComponent width="100" height="20" includeIn="slider"/>
+    <view:DropDownListInputComponent width="100" height="20" includeIn="dropdown"/>
+
+    <s:DropDownList id="inputChooser" width="100" height="20" change="{currentState = inputChooser.selectedItem}">
+        <s:dataProvider>
+            <s:ArrayCollection>
+                <fx:String>stepper</fx:String>
+                <fx:String>slider</fx:String>
+                <fx:String>dropdown</fx:String>
+            </s:ArrayCollection>
+        </s:dataProvider>
+    </s:DropDownList>
 
 </s:Application>

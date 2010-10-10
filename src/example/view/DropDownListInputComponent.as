@@ -1,24 +1,22 @@
 package example.view
 {
-
     import flash.events.Event;
 
     import org.osflash.signals.ISignal;
-
     import org.osflash.signals.Signal;
 
-    import spark.components.NumericStepper;
+    import spark.components.DropDownList;
     import spark.components.supportClasses.SkinnableComponent;
 
-    public class NumericStepperInputComponent extends SkinnableComponent implements INumberEntry
+    public class DropDownListInputComponent extends SkinnableComponent implements INumberEntry
     {
 
         [SkinPart(required="true")]
-        public var numberStepper:NumericStepper;
+        public var numberList:DropDownList;
 
         private var _numberEntered:Signal;
 
-        public function NumericStepperInputComponent()
+        public function DropDownListInputComponent()
         {
             _numberEntered = new Signal(Number);
         }
@@ -28,32 +26,31 @@ package example.view
             return _numberEntered;
         }
 
-        private function onNumberStepperChange(event:Event):void
-        {
-            _numberEntered.dispatch(numberStepper.value);
-        }
-
         override protected function partAdded(partName:String, instance:Object):void
         {
             super.partAdded(partName, instance);
-            switch ( instance )
+            switch( instance )
             {
-                case numberStepper:
-                    numberStepper.addEventListener(Event.CHANGE,onNumberStepperChange);
+                case numberList:
+                    numberList.addEventListener(Event.CHANGE,onNumberSliderChange);
                     break;
             }
         }
 
-
         override protected function partRemoved(partName:String, instance:Object):void
         {
-            switch ( instance )
+            switch( instance )
             {
-                case numberStepper:
-                    numberStepper.removeEventListener(Event.CHANGE,onNumberStepperChange);
+                case numberList:
+                    numberList.removeEventListener(Event.CHANGE,onNumberSliderChange);
                     break;
             }
-            super.partRemoved(partName, instance);
+            super.partAdded(partName, instance);
+        }
+
+        private function onNumberSliderChange(event:Event):void
+        {
+            _numberEntered.dispatch(numberList.selectedItem);
         }
     }
 

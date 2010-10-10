@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<s:Skin
+        xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+>
+    <s:DropDownList id="numberList" width="100%" height="100%">
+        <s:dataProvider>
+            <s:ArrayCollection>
+                <fx:Number>1</fx:Number>
+                <fx:Number>2</fx:Number>
+                <fx:Number>3</fx:Number>
+                <fx:Number>4</fx:Number>
+                <fx:Number>5</fx:Number>
+                <fx:Number>6</fx:Number>
+                <fx:Number>7</fx:Number>
+                <fx:Number>8</fx:Number>
+                <fx:Number>9</fx:Number>
+                <fx:Number>10</fx:Number>
+            </s:ArrayCollection>
+        </s:dataProvider>
+    </s:DropDownList>
+</s:Skin>

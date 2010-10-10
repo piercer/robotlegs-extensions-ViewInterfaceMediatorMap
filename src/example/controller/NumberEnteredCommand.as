@@ -1,7 +1,7 @@
 package example.controller
 {
     import example.events.NumberEnteredEvent;
-    import example.model.NumberController;
+    import example.model.NumberModel;
 
     public class NumberEnteredCommand
     {
@@ -10,9 +10,9 @@ package example.controller
         public var event:NumberEnteredEvent;
 
         [Inject]
-        public var numberModel:NumberController;
+        public var numberModel:NumberModel;
 
-        public function execute()
+        public function execute():void
         {
             numberModel.currentNumber = event.number;
         }
