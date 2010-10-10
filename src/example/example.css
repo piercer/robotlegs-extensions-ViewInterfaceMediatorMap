@@ -1,0 +1,11 @@
+@namespace "example.view.*";
+
+LabelDisplayComponent
+{
+    skin-class: ClassReference("example.skins.LabelDisplayComponentSkin");
+}
+
+NumericStepperInputComponent
+{
+    skin-class: ClassReference("example.skins.NumericStepperInputComponentSkin");
+}

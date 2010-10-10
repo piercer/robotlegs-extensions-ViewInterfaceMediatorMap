@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<s:Skin
+        xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+>
+    <s:NumericStepper id="numberStepper" minimum="0" maximum="100" stepSize="1"/>
+</s:Skin>
