@@ -6,8 +6,7 @@ h2. Rationale
 
 Sometimes you want to inject a view into a mediator as an interface. For example
 
-pre.
-public class myMediator extends Mediator
+pre. public class myMediator extends Mediator
 {
 	[Inject]
 	public var view:IViewInterface;
