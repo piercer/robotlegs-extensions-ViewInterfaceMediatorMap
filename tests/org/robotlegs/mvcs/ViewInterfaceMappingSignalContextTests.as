@@ -18,7 +18,7 @@ package org.robotlegs.mvcs
 	import org.robotlegs.mvcs.support.TestViewInterfaceMappingSignalContext;
 	import org.robotlegs.mvcs.support.TestContextView;
 
-	public class ViewInterfaceMappingContextTests
+	public class ViewInterfaceMappingSignalContextTests
 	{
 		private var context:TestViewInterfaceMappingSignalContext;
 		private var contextView:DisplayObjectContainer;
