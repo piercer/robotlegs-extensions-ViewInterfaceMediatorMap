@@ -4,18 +4,53 @@ A pure view interface enabled MediatorMap for use in a Robotlegs context
 
 h2. Rationale 
 
-Sometimes you want to inject a view into a mediator as an interface. For example
+When using Robotlegs you sometimes you want to inject a view into a mediator as an interface. For example
 
-pre. public class myMediator extends Mediator
+pre. public class MyViewMediator extends Mediator
 {
 	[Inject]
-	public var view:IViewInterface;
-	.
-	.
-	.
+	public var view:IMyView;
 }
 
-The normal mechanism for mapping a mediator to a view in Robotlegs is to use the  
+The normal mechanism for mapping this in your context is to add a third argument to the mapView command telling the mediatorMap what you would like to inject the view 'as'
 
+pre. override public function startup():void
+{
+	mediatorMap.mapView(MyViewClass,MyViewMediator,IMyView);
+}  
 
-public function mapView(viewClassOrName:*, mediatorClass:Class, injectViewAs:* = null, autoCreate:Boolean = true, autoRemove:Boolean = true):void
+The problem with this is that it adds a concrete reference to a concrete class in the context - MyViewClass. The call is like this for performance reasons - the least performant bit of Robotlegs is the automatic view wiring and adding the concrete class allows it to be faster.
+
+That being said if your application does not need every last drop of performance then it would be nice to remove the concrete instance and create a context that only knows about interfaces. 
+
+Enter the View Interface Mediator Map. It is a drop in replacement for the current 1.3.0 Robotlegs Mediator Map with all of the same functionality. 
+
+However if you want to you can map mediators directly to view interfaces. The above piece of code could then be
+
+pre. override public function startup():void
+{
+	mediatorMap.mapView(IMyView,MyViewMediator);
+}
+
+This has a number of advantages:
+
+* Your context only cares about what your view does not how it does it.
+* A context swc can be produced that has no dependencies on actual view impementations.
+* The concrete view classes do not have to be baked in at compile time. You can swap views in and out at runtime, even from loaded modules, and as long as they implement the interface, the correct mediator will be created for them even though the context will never have seen the actual concrete classes before.
+
+h2. Usage
+
+In order to use this new MediatorMap simply extend the Robotlegs Context as normal and override the getMediator method like so
+
+pre. public class MyContext extends Context
+{
+    //
+    // Override the default mediator map with one that can map to interfaces
+    //
+    override protected function get mediatorMap():IMediatorMap
+    {
+        return _mediatorMap ||= new ViewInterfaceMediatorMap(contextView, createChildInjector(), reflector);
+    }
+}
+
+With this done you can map mediators to view interfaces
