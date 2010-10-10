@@ -7,7 +7,7 @@ package example.mvcs
     import example.view.INumberDisplay;
     import example.view.INumberEntry;
 
-    import org.robotlegs.base.InterfaceEnabledMediatorMap;
+    import org.robotlegs.base.ViewInterfaceMediatorMap;
     import org.robotlegs.core.IMediatorMap;
     import org.robotlegs.mvcs.Context;
 
@@ -23,7 +23,7 @@ package example.mvcs
         //
         override protected function get mediatorMap():IMediatorMap
         {
-            return _mediatorMap ||= new InterfaceEnabledMediatorMap(contextView, createChildInjector(), reflector);
+            return _mediatorMap ||= new ViewInterfaceMediatorMap(contextView, createChildInjector(), reflector);
         }
 
 

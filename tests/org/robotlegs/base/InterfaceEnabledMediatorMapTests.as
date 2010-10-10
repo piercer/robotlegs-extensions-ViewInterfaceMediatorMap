@@ -33,7 +33,7 @@ package org.robotlegs.base
 		protected var contextView:DisplayObjectContainer;
 		protected var eventDispatcher:IEventDispatcher;
 		protected var commandExecuted:Boolean;
-		protected var mediatorMap:InterfaceEnabledMediatorMap;
+		protected var mediatorMap:ViewInterfaceMediatorMap;
 		protected var injector:IInjector;
 		protected var reflector:IReflector;
 		protected var eventMap:IEventMap;
@@ -55,7 +55,7 @@ package org.robotlegs.base
 			eventDispatcher = new EventDispatcher();
 			injector = new SwiftSuspendersInjector();
 			reflector = new SwiftSuspendersReflector();
-			mediatorMap = new InterfaceEnabledMediatorMap(contextView, injector, reflector);
+			mediatorMap = new ViewInterfaceMediatorMap(contextView, injector, reflector);
 
 			injector.mapValue(DisplayObjectContainer, contextView);
 			injector.mapValue(IInjector, injector);

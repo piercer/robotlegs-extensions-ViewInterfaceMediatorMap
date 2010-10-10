@@ -23,7 +23,7 @@ package org.robotlegs.base
 	/**
 	 * An abstract <code>IMediatorMap</code> implementation
 	 */
-	public class InterfaceEnabledMediatorMap extends ViewMapBase implements IMediatorMap
+	public class ViewInterfaceMediatorMap extends ViewMapBase implements IMediatorMap
 	{
 		/**
 		 * @private
@@ -76,7 +76,7 @@ package org.robotlegs.base
 		 * @param injector An <code>IInjector</code> to use for this context
 		 * @param reflector An <code>IReflector</code> to use for this context
 		 */
-		public function InterfaceEnabledMediatorMap(contextView:DisplayObjectContainer, injector:IInjector, reflector:IReflector)
+		public function ViewInterfaceMediatorMap(contextView:DisplayObjectContainer, injector:IInjector, reflector:IReflector)
 		{
 			super(contextView, injector);
 			
