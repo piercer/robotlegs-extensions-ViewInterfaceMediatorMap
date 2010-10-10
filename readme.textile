@@ -19,11 +19,9 @@ pre. override public function startup():void
 	mediatorMap.mapView(MyViewClass,MyViewMediator,IMyView);
 }  
 
-The problem with this is that it adds a concrete reference to a concrete class in the context - MyViewClass. The call is like this for performance reasons - the least performant bit of Robotlegs is the automatic view wiring and adding the concrete class allows it to be faster.
+The problem with this is that it adds a concrete reference to a concrete class in the context - MyViewClass. It would be nice to simply specify the view interface and mediator.
 
-That being said if your application does not need every last drop of performance then it would be nice to remove the concrete instance and create a context that only knows about interfaces. 
-
-Enter the "ViewInterfaceMediatorMap":http://github.com/piercer/robotlegs-extensions-ViewIntefaceMediatorMap/blob/master/src/org/robotlegs/base/ViewInterfaceMediatorMap.as. It is a drop in replacement for the current 1.3.0 Robotlegs MediatorMap with all of the same functionality, but with the added bonus that you can map mediators directly to view interfaces. The above piece of code could then be
+Enter the "ViewInterfaceMediatorMap":http://github.com/piercer/robotlegs-extensions-ViewIntefaceMediatorMap/blob/master/src/org/robotlegs/base/ViewInterfaceMediatorMap.as. It is a drop in replacement for the current 1.3.0 Robotlegs MediatorMap with all of the same functionality, but with the added bonus that you can map mediators directly to view interfaces. The above piece of code could then be written
 
 pre. override public function startup():void
 {
@@ -55,7 +53,7 @@ With this done you can map mediators to view interfaces.
 
 h3. Performance
 
-As has been stated, mapping to interfaces is not as performant as mapping to concrete classes - however this mediator map has been benchmarked with the software "here":http://http://github.com/piercer/robotlegs-mediatormap-benchmark and it has been found to be only fractionally slower than the normal mediator map.
+Mapping mediators to views is the least performant bit of Robotlegs. Adding the concrete class to the mapView call allows it to be faster. However this mediator map has been benchmarked with the software "here":http://http://github.com/piercer/robotlegs-mediatormap-benchmark and it has been found to be only fractionally slower than the normal mediator map.
 
 h3. Signals
 
