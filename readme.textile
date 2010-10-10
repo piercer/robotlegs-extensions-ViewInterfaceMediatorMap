@@ -2,7 +2,7 @@ h2. View Interface Mediator Map
 
 A pure view interface enabled MediatorMap for use in a Robotlegs context
 
-h2. Rationale 
+h3. Rationale 
 
 When using Robotlegs you sometimes you want to inject a view into a mediator as an interface. For example
 
@@ -23,9 +23,7 @@ The problem with this is that it adds a concrete reference to a concrete class i
 
 That being said if your application does not need every last drop of performance then it would be nice to remove the concrete instance and create a context that only knows about interfaces. 
 
-Enter the View Interface Mediator Map. It is a drop in replacement for the current 1.3.0 Robotlegs Mediator Map with all of the same functionality. 
-
-However if you want to you can map mediators directly to view interfaces. The above piece of code could then be
+Enter the "ViewInterfaceMediatorMap":http://github.com/piercer/robotlegs-extensions-ViewIntefaceMediatorMap/blob/master/src/org/robotlegs/base/ViewInterfaceMediatorMap.as. It is a drop in replacement for the current 1.3.0 Robotlegs MediatorMap with all of the same functionality, but with the added bonus that you can map mediators directly to view interfaces. The above piece of code could then be
 
 pre. override public function startup():void
 {
@@ -35,12 +33,12 @@ pre. override public function startup():void
 This has a number of advantages:
 
 * Your context only cares about what your view does not how it does it.
-* A context swc can be produced that has no dependencies on actual view impementations.
+* A context swc can be produced that has no dependencies on actual view implementations.
 * The concrete view classes do not have to be baked in at compile time. You can swap views in and out at runtime, even from loaded modules, and as long as they implement the interface, the correct mediator will be created for them even though the context will never have seen the actual concrete classes before.
 
-h2. Usage
+h3. Usage
 
-In order to use this new MediatorMap simply extend the Robotlegs Context as normal and override the getMediator method like so
+In order to use this new mediator map simply extend the Robotlegs Context as normal and override the get mediatorMap property like so
 
 pre. public class MyContext extends Context
 {
@@ -53,4 +51,54 @@ pre. public class MyContext extends Context
     }
 }
 
-With this done you can map mediators to view interfaces
+With this done you can map mediators to view interfaces.
+
+h3. Performance
+
+As has been stated, mapping to interfaces is not as performant as mapping to concrete classes - however this mediator map has been benchmarked with the software "here":http://http://github.com/piercer/robotlegs-mediatormap-benchmark and it has been found to be only fractionally slower than the normal mediator map.
+
+h3. Signals
+
+This extension really benefits from the use of as3-signals since they enable a view to impement an interface, something that simply does not fit into the way events work. Please see the example.
+
+h3. Example
+
+In the repository is a very simple example that shows how mapping to an interface can enable multiple view mechanisms and components to 'plug in' to the same underlying business logic.
+
+The example is written as if it were a big application and so it is massively over engineered. The code is however intended to show a very clean approach to application and component development. It is like the application and views that control it are two separate things - which is good.
+
+The application consists of a simple context
+
+pre. package example.mvcs
+{
+    public class InterfaceEnabledMediatorMapContextExample extends Context
+    {
+        override protected function get mediatorMap():IMediatorMap
+        {
+            return _mediatorMap ||= new ViewInterfaceMediatorMap(contextView, createChildInjector(), reflector);
+        }
+        override public function startup():void
+        {
+            injector.mapSingleton(NumberModel);
+            injector.mapSingleton(NumberUpdatedSignal);
+            mediatorMap.mapView(INumberEntry,NumberEntryMediator);
+            mediatorMap.mapView(INumberDisplay,NumberDisplayMediator);
+            commandMap.mapEvent(NumberEnteredEvent.NUMBER_ENTERED,NumberEnteredCommand);
+        }
+    }
+}
+
+Where we can see that two mediators are mapped to two different interfaces. The interfaces use signals to represent the transmission of information between the application and its view, for example the INumberEntry interface looks like this
+
+pre. package example.view
+{
+    import org.osflash.signals.ISignal;
+    public interface INumberEntry
+    {
+        function get numberEntered():ISignal;
+    }
+}
+
+If a view that implements this interface is added to the stage then a NumberEntryMediator is created for it which should understand the signal that it dispatches. When a number is chosen by the view it dispatches a signal to show that the selected number has changed, this causes a command to be triggered inside the application (NumberEnteredCommand) that updates a model which updates the view.
+
+The application actually has three views that implement the INumberEntry interface and which one is currently in use can be chosen by a dropdownlist. Even though there is only one mapping in the context, and the context has never seen these classes the application still works and each input mechanism works as it should.

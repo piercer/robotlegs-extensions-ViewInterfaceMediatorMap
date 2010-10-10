@@ -27,7 +27,7 @@
     <view:SliderInputComponent width="100" height="20" includeIn="slider"/>
     <view:DropDownListInputComponent width="100" height="20" includeIn="dropdown"/>
 
-    <s:DropDownList id="inputChooser" width="100" height="20" change="{currentState = inputChooser.selectedItem}">
+    <s:DropDownList id="inputChooser" width="100" height="20" change="{currentState = inputChooser.selectedItem}" selectedIndex="0">
         <s:dataProvider>
             <s:ArrayCollection>
                 <fx:String>stepper</fx:String>
