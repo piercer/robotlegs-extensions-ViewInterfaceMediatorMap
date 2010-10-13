@@ -17,6 +17,7 @@ package org.robotlegs.base
 	import org.robotlegs.core.IMediator;
 	import org.robotlegs.core.IMediatorMap;
 	import org.robotlegs.core.IReflector;
+    import org.robotlegs.mvcs.support.ITestContextView;
     import org.robotlegs.mvcs.support.IViewComponent;
     import org.robotlegs.mvcs.support.TestContextView;
 	import org.robotlegs.mvcs.support.TestContextViewMediator;
@@ -301,19 +302,33 @@ package org.robotlegs.base
 			delete data.method;
 		}
 
-		[Test]
-		public function contextViewMediatorIsCreatedWhenMapped():void
-		{
-			mediatorMap.mapView( TestContextView, TestContextViewMediator );
-			Assert.assertTrue('Mediator should have been created for contextView', mediatorMap.hasMediatorForView(contextView));
-		}
+        [Test]
+        public function contextViewMediatorIsCreatedWhenMapped():void
+        {
+            mediatorMap.mapView( TestContextView, TestContextViewMediator );
+            Assert.assertTrue('Mediator should have been created for contextView', mediatorMap.hasMediatorForView(contextView));
+        }
 
-		[Test]
-		public function contextViewMediatorIsNotCreatedWhenMappedAndAutoCreateIsFalse():void
-		{
-			mediatorMap.mapView( TestContextView, TestContextViewMediator, null, false );
-			Assert.assertFalse('Mediator should NOT have been created for contextView', mediatorMap.hasMediatorForView(contextView));
-		}
+        [Test]
+        public function contextViewMediatorIsCreatedWhenMappedToInterface():void
+        {
+            mediatorMap.mapView( ITestContextView, TestContextViewMediator );
+            Assert.assertTrue('Mediator should have been created for contextView when mapped to interface', mediatorMap.hasMediatorForView(contextView));
+        }
+
+        [Test]
+        public function contextViewMediatorIsNotCreatedWhenMappedAndAutoCreateIsFalse():void
+        {
+            mediatorMap.mapView( TestContextView, TestContextViewMediator, null, false );
+            Assert.assertFalse('Mediator should NOT have been created for contextView', mediatorMap.hasMediatorForView(contextView));
+        }
+
+        [Test]
+        public function contextViewMediatorIsNotCreatedWhenMappedToInterfaceAndAutoCreateIsFalse():void
+        {
+            mediatorMap.mapView( ITestContextView, TestContextViewMediator, null, false );
+            Assert.assertFalse('Mediator should NOT have been created for contextView', mediatorMap.hasMediatorForView(contextView));
+        }
 
         [Test]
         public function unmapView():void

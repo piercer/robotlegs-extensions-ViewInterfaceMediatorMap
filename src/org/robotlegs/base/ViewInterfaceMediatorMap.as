@@ -129,7 +129,7 @@ package org.robotlegs.base
 				config.typedViewClasses = [viewClassOrName];
 			}
 			mappingConfigByViewClassName[viewClassName] = config;
-			if (autoCreate && contextView && (viewClassName == getQualifiedClassName(contextView) ))
+			if (autoCreate && contextView && getMappingConfig(contextView))
 			{
 				createMediator(contextView);
 			}
@@ -334,14 +334,18 @@ package org.robotlegs.base
 			var config:MappingConfig = mappingConfigByViewClassName[className];
 			if (!config)
 			{
+                //
 				// This stuff should be handled by the Reflector
+                //
 				var classXML:XML = describeType(viewComponent);
 				for each (var implementedInterface:XML in classXML.implementsInterface)
 				{
 					var interfaceName:String = implementedInterface.@type;
 					config = mappingConfigByViewClassName[interfaceName];
+                    //
 					// We can't cache the config by throwing into mappingConfigByViewClassName
 					// as there is no way to invalidate that action
+                    //
 					if (config)
 					{
 						mappingConfigByViewClassName[className]=config;
@@ -349,10 +353,11 @@ package org.robotlegs.base
 						return config;
 					}
 				}
-			}
-			if (!config)
-			{
-				unmappedViews[className]=1;
+                //
+                // If we get here the no matching interface mapping was
+                // found so we add this className to the list of unmapped Views
+                //
+                unmappedViews[className]=1;
 			}
 			return config;
 		}
