@@ -100,14 +100,13 @@ package org.robotlegs.base
 		public function mapView(viewClassOrName:*, mediatorClass:Class, injectViewAs:* = null, autoCreate:Boolean = true, autoRemove:Boolean = true):void
 		{
 			var viewClassName:String = reflector.getFQCN(viewClassOrName);
+
 			if (mappingConfigByViewClassName[viewClassName] != null)
-			{
 				throw new ContextError(ContextError.E_MEDIATORMAP_OVR + ' - ' + mediatorClass);
-			}
+
 			if (!reflector.classExtendsOrImplements(mediatorClass, IMediator))
-			{
 				throw new ContextError(ContextError.E_MEDIATORMAP_NOIMPL + ' - ' + mediatorClass);
-			}
+
 			unmappedViews = new Dictionary(false);
 			var config:MappingConfig = new MappingConfig();
 			config.mediatorClass = mediatorClass;
@@ -129,13 +128,18 @@ package org.robotlegs.base
 				config.typedViewClasses = [viewClassOrName];
 			}
 			mappingConfigByViewClassName[viewClassName] = config;
-			if (autoCreate && contextView && getMappingConfig(contextView))
-			{
-				createMediator(contextView);
-			}
-			activate();
-		}		
-		
+            if (autoCreate || autoRemove)
+            {
+                viewListenerCount++;
+                if (viewListenerCount == 1)
+                    addListeners();
+            }
+
+            // This was a bad idea - causes unexpected eager instantiation of object graph
+            if (autoCreate && contextView && (viewClassName == getQualifiedClassName(contextView) ))
+                createMediatorUsing(contextView, viewClassName, config);
+		}
+
 		/**
 		 * @inheritDoc
 		 */
@@ -143,38 +147,26 @@ package org.robotlegs.base
 		{
 			var viewClassName:String = reflector.getFQCN(viewClassOrName);
 			var config:MappingConfig = mappingConfigByViewClassName[viewClassName];
-			for each (var mappedConcreteViewClassName:String in config.mappedConcreteClasses)
-			{
-				delete mappingConfigByViewClassName[mappedConcreteViewClassName];				
-			}
+            if (config && (config.autoCreate || config.autoRemove))
+            {
+                viewListenerCount--;
+                if (viewListenerCount == 0)
+                    removeListeners();
+                for each (var mappedConcreteViewClassName:String in config.mappedConcreteClasses)
+                {
+                    delete mappingConfigByViewClassName[mappedConcreteViewClassName];
+                }
+            }
 			delete mappingConfigByViewClassName[viewClassName];
 			unmappedViews = new Dictionary(false);
 		}
-		
+
 		/**
 		 * @inheritDoc
 		 */
 		public function createMediator(viewComponent:Object):IMediator
 		{
-			var mediator:IMediator = mediatorByView[viewComponent];
-			if (mediator == null)
-			{
-				var config:MappingConfig = getMappingConfig(viewComponent);
-				if (config)
-				{
-					for each (var claxx:Class in config.typedViewClasses)
-                    {
-						injector.mapValue(claxx, viewComponent);
-					}
-					mediator = injector.instantiate(config.mediatorClass);
-					for each (var clazz:Class in config.typedViewClasses)
-                    {
-						injector.unmap(clazz);
-					}
-					registerMediator(viewComponent, mediator);
-				}
-			}
-			return mediator;
+            return createMediatorUsing(viewComponent);
 		}
 		
 		/**
@@ -188,7 +180,7 @@ package org.robotlegs.base
 			mediator.setViewComponent(viewComponent);
 			mediator.preRegister();
 		}
-		
+
 		/**
 		 * @inheritDoc
 		 */
@@ -205,7 +197,7 @@ package org.robotlegs.base
 			}
 			return mediator;
 		}
-		
+
 		/**
 		 * @inheritDoc
 		 */
@@ -221,7 +213,16 @@ package org.robotlegs.base
 		{
 			return mediatorByView[viewComponent];
 		}
-		
+
+		/**
+		 * @inheritDoc
+		 */
+		public function hasMapping(viewClassOrName:*):Boolean
+		{
+			var viewClassName:String = reflector.getFQCN(viewClassOrName);
+			return (mappingConfigByViewClassName[viewClassName] != null);
+		}
+
 		/**
 		 * @inheritDoc
 		 */
@@ -236,12 +237,8 @@ package org.robotlegs.base
 		public function hasMediator(mediator:IMediator):Boolean
 		{
 			for each (var med:IMediator in mediatorByView)
-			{
 				if (med == mediator)
-				{
 					return true;
-				}
-			}
 			return false;
 		}
 		
@@ -254,7 +251,7 @@ package org.robotlegs.base
 		 */		
 		protected override function addListeners():void
 		{
-			if (contextView && enabled && _active)
+			if (contextView && enabled)
 			{
 				contextView.addEventListener(Event.ADDED_TO_STAGE, onViewAdded, useCapture, 0, true);
 				contextView.addEventListener(Event.REMOVED_FROM_STAGE, onViewRemoved, useCapture, 0, true);
@@ -266,7 +263,7 @@ package org.robotlegs.base
 		 */		
 		protected override function removeListeners():void
 		{
-			if (contextView && enabled && _active)
+			if (contextView)
 			{
 				contextView.removeEventListener(Event.ADDED_TO_STAGE, onViewAdded, useCapture);
 				contextView.removeEventListener(Event.REMOVED_FROM_STAGE, onViewRemoved, useCapture);
@@ -283,14 +280,39 @@ package org.robotlegs.base
 				delete mediatorsMarkedForRemoval[e.target];
 				return;
 			}
+            var viewClassName:String = getQualifiedClassName(e.target);
 			var config:MappingConfig = getMappingConfig(e.target);
 			if (config && config.autoCreate)
-			{
-				createMediator(e.target);
-			}
-		}
+                createMediatorUsing(e.target, viewClassName, config);
+        }
 		
-		/**
+        /**
+		 * @private
+		 */
+		protected function createMediatorUsing(viewComponent:Object, viewClassName:String = '', config:MappingConfig = null):IMediator
+		{
+            var mediator:IMediator = mediatorByView[viewComponent];
+            if (mediator == null)
+            {
+                config ||= getMappingConfig(viewComponent, viewClassName);
+                if (config)
+                {
+                    for each (var claxx:Class in config.typedViewClasses)
+                    {
+                        injector.mapValue(claxx, viewComponent);
+                    }
+                    mediator = injector.instantiate(config.mediatorClass);
+                    for each (var clazz:Class in config.typedViewClasses)
+                    {
+                        injector.unmap(clazz);
+                    }
+                    registerMediator(viewComponent, mediator);
+                }
+            }
+            return mediator;
+		}
+
+        /**
 		 * Flex framework work-around part #5
 		 */
 		protected function onViewRemoved(e:Event):void
@@ -324,14 +346,14 @@ package org.robotlegs.base
 			hasMediatorsMarkedForRemoval = false;
 		}
 		
-		private function getMappingConfig(viewComponent:Object):MappingConfig
+		private function getMappingConfig(viewComponent:Object, viewClassName:String = ''):MappingConfig
 		{
-			var className:String = getQualifiedClassName(viewComponent);
-			if (unmappedViews[className])
+			viewClassName ||= getQualifiedClassName(viewComponent);
+			if (unmappedViews[viewClassName])
 			{
 				return null;
 			}
-			var config:MappingConfig = mappingConfigByViewClassName[className];
+			var config:MappingConfig = mappingConfigByViewClassName[viewClassName];
 			if (!config)
 			{
                 //
@@ -348,8 +370,8 @@ package org.robotlegs.base
                     //
 					if (config)
 					{
-						mappingConfigByViewClassName[className]=config;
-						config.mappedConcreteClasses.push(className);
+						mappingConfigByViewClassName[viewClassName]=config;
+						config.mappedConcreteClasses.push(viewClassName);
 						return config;
 					}
 				}
@@ -357,7 +379,7 @@ package org.robotlegs.base
                 // If we get here the no matching interface mapping was
                 // found so we add this className to the list of unmapped Views
                 //
-                unmappedViews[className]=1;
+                unmappedViews[viewClassName]=1;
 			}
 			return config;
 		}
