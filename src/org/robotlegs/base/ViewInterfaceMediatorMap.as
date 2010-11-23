@@ -136,8 +136,23 @@ package org.robotlegs.base
             }
 
             // This was a bad idea - causes unexpected eager instantiation of object graph
-            if (autoCreate && contextView && (viewClassName == getQualifiedClassName(contextView) ))
-                createMediatorUsing(contextView, viewClassName, config);
+            //
+            // If
+            //
+            // 1) autoCreate is true and we already have a contextView
+            // 2) A config exists for the contextView, and
+            // 3) the config we have just added is that config
+            //
+            // Then we should autowire the contextView now.
+            //
+            if (autoCreate && contextView)
+            {
+                var config2:MappingConfig = getMappingConfig(contextView);
+                if (config == config2)
+                {
+                    createMediatorUsing(contextView, viewClassName, config);
+                }
+            }
 		}
 
 		/**
